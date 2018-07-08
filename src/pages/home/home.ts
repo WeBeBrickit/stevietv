@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { DomSanitizer } from '@angular/platform-browser';
-import { YoutubeVideoPlayer } from '@ionic-native/youtube-video-player';
+// import { YT } from 'https://www.youtube.com/iframe_api';
+
+declare var YT;
 
 @Component({
   selector: 'page-home',
@@ -10,21 +12,23 @@ import { YoutubeVideoPlayer } from '@ionic-native/youtube-video-player';
 export class HomePage {
 
   video_id: any;
+  done: boolean;
+  player: any;
 
   constructor(public navCtrl: NavController,
     public sanitizer: DomSanitizer) {
 
       this.video_id = 'tkzY_VwNIek';
-      // let tag = document.createElement('script');
+      
 
-      // tag.src = "https://www.youtube.com/iframe_api";
-      // let firstScriptTag = document.getElementsByTagName('script')[0];
-      // firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      this.done = false;
   }
+
 
 
   ionViewDidLoad() {
       console.log('ionViewDidLoad VideoSinglePage');
+
       this.datBoi();
   }
 
@@ -40,19 +44,39 @@ export class HomePage {
 
   datBoi() {
       console.log(document.getElementById('mainBoi'));
+      let iFrizz = document.getElementById('mainBoi');
+      let innerDoc = iFrizz.contentDocument || iFrizz.contentWindow.document;
+      console.log(innerDoc.getElementById('video'));
   }
 
-  // onYouTubeIframeAPIReady() {
-  //   this.player = new YT.Player('player', {
-  //     height: '390',
-  //     width: '640',
-  //     videoId: 'M7lc1UVf-VE',
-  //     events: {
-  //       'onReady': onPlayerReady,
-  //       'onStateChange': onPlayerStateChange
-  //     }
-  //   });
-  // }
+  
+
+  onYouTubeIframeAPIReady() {
+    this.player = new YT.Player('player', {
+      height: '390',
+      width: '640',
+      videoId: this.video_id,
+      events: {
+        'onReady': this.onPlayerReady,
+        'onStateChange': this.onPlayerStateChange
+      }
+    });
+  }
+
+  onPlayerReady(event) {
+    event.target.playVideo();
+  }
+
+  onPlayerStateChange(event) {
+    if (event.data == YT.PlayerState.PLAYING && !this.done) {
+      setTimeout(this.stopVideo, 6000);
+      this.done = true;
+    }
+  }
+
+  stopVideo() {
+    this.player.stopVideo();
+  }
   
 
 }
